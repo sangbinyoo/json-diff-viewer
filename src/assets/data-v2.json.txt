@@ -1,0 +1,36 @@
+{
+  "user": {
+    "id": 1001,
+    "name": "Kim Minsoo",
+    "email": "minsoo.kim@example.com",
+    "age": 30,
+    "status": "PREMIUM"
+  },
+  "address": {
+    "city": "Seoul",
+    "district": "Songpa",
+    "zipCode": "05510"
+  },
+  "settings": {
+    "theme": "dark",
+    "language": "ko",
+    "notifications": false,
+    "timezone": "Asia/Seoul"
+  },
+  "subscription": {
+    "plan": "PRO",
+    "price": 19900,
+    "autoRenew": true
+  },
+  "tags": [
+    "frontend",
+    "react",
+    "typescript",
+    "ai"
+  ],
+  "profile": {
+    "github": "minsoo-dev",
+    "careerYears": 7
+  },
+  "lastLogin": "2026-06-03T22:45:00Z"
+}

@@ -1,0 +1,30 @@
+{
+  "user": {
+    "id": 1001,
+    "name": "Kim Minsoo",
+    "email": "minsoo.kim@example.com",
+    "age": 29,
+    "status": "ACTIVE"
+  },
+  "address": {
+    "city": "Seoul",
+    "district": "Gangnam",
+    "zipCode": "06236"
+  },
+  "settings": {
+    "theme": "light",
+    "language": "ko",
+    "notifications": true
+  },
+  "subscription": {
+    "plan": "BASIC",
+    "price": 9900,
+    "autoRenew": true
+  },
+  "tags": [
+    "frontend",
+    "angular",
+    "typescript"
+  ],
+  "lastLogin": "2026-05-30T09:15:00Z"
+}

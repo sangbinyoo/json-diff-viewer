@@ -1,0 +1,24 @@
+.token {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 12px;
+  border-radius: 3px;
+  padding: 0 2px;
+}
+
+.string  { color: #3B6D11; }
+.number  { color: #BA7517; }
+.boolean { color: #993556; }
+.null    { color: var(--color-text-secondary); font-style: italic; }
+.undefined { color: var(--color-text-secondary); font-style: italic; opacity: 0.6; }
+.meta    { color: var(--color-text-secondary); }
+
+/* dark mode overrides */
+@media (prefers-color-scheme: dark) {
+  .string  { color: #9FE1CB; }
+  .number  { color: #FAC775; }
+  .boolean { color: #F4C0D1; }
+}
+
+.hl_added   { background: rgba(29, 158, 117, 0.15); }
+.hl_removed { background: rgba(226, 75, 74, 0.15); }
+.hl_changed { background: rgba(186, 117, 23, 0.15); }
