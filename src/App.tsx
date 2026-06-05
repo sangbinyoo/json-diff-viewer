@@ -86,6 +86,7 @@ const App: React.FC = () => {
             <DiffViewer
               rows={diff.rows}
               sortMode={diff.sortMode}
+              filterMode={diff.filterMode}
               onSortChange={diff.setSortMode}
             />
           </section>

@@ -1,28 +1,70 @@
+/* ── 전체 래퍼 ── */
 .wrapper {
   display: flex;
   flex-direction: column;
   border: 1px solid var(--color-border);
   border-radius: 10px;
   overflow: hidden;
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 14px;
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
   font-size: 13px;
 }
 
-.sortLabel {
-  color: var(--color-text-secondary);
+/* ── 툴바 ── */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 14px;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  flex-wrap: wrap;
+}
+
+.legend {
+  display: flex;
+  gap: 12px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
   font-size: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--color-text-secondary);
+}
+
+.legendMarker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: monospace;
+}
+
+.legendAdded   .legendMarker { background: rgba(34, 197, 94, 0.15);  color: #16a34a; }
+.legendRemoved .legendMarker { background: rgba(239, 68, 68, 0.15);  color: #dc2626; }
+.legendChanged .legendMarker { background: rgba(234, 179, 8, 0.15);  color: #ca8a04; }
+
+.sortControl {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sortLabel {
+  font-size: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--color-text-secondary);
 }
 
 .sortSelect {
   font-size: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   padding: 4px 8px;
   border-radius: 6px;
   border: 1px solid var(--color-border);
@@ -34,16 +76,15 @@
 .rowCount {
   margin-left: auto;
   font-size: 12px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   color: var(--color-text-secondary);
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 1px 1fr;
-}
-
+/* ── 컬럼 헤더 ── */
 .colHeader {
-  padding: 8px 14px;
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 14px;
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
   font-size: 11px;
@@ -51,95 +92,137 @@
   text-transform: uppercase;
   letter-spacing: 0.07em;
   color: var(--color-text-secondary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-.colLabel {
+/* ── 트리 컨테이너 ── */
+.tree {
+  max-height: 560px;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+/* ── 각 행 ── */
+.row {
   display: flex;
   align-items: center;
   gap: 6px;
-}
-
-.divider {
-  background: var(--color-border);
-  grid-row: span 2;
-}
-
-.lines {
-  max-height: 520px;
-  overflow-y: auto;
-  overflow-x: hidden;
-}
-
-.line {
-  display: flex;
-  align-items: baseline;
-  padding: 2px 10px;
-  min-height: 24px;
+  min-height: 28px;
+  padding-right: 14px;
   border-bottom: 1px solid var(--color-border-subtle);
+  transition: background 0.08s;
 }
 
-.line:last-child { border-bottom: none; }
+.row:last-child { border-bottom: none; }
+.row:hover { background: var(--color-surface-hover); }
 
-.lineAdded     { background: rgba(29, 158, 117, 0.07); }
-.lineRemoved   { background: rgba(226, 75, 74, 0.07); }
-.lineChanged   { background: rgba(186, 117, 23, 0.07); }
-.lineUnchanged { background: transparent; }
-.lineEmpty     { background: transparent; opacity: 0.35; }
+/* 변경 유형별 행 배경 */
+.row_added     { background: rgba(34,  197, 94,  0.05); }
+.row_removed   { background: rgba(239, 68,  68,  0.05); }
+.row_changed   { background: rgba(234, 179, 8,   0.05); }
+.row_unchanged { background: transparent; }
 
-.lineNum {
-  min-width: 28px;
-  font-size: 11px;
+.row_added:hover     { background: rgba(34,  197, 94,  0.10); }
+.row_removed:hover   { background: rgba(239, 68,  68,  0.10); }
+.row_changed:hover   { background: rgba(234, 179, 8,   0.10); }
+
+/* ── 토글 버튼 ── */
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  font-size: 10px;
   color: var(--color-text-secondary);
-  opacity: 0.45;
+  cursor: default;
   user-select: none;
-  font-family: 'JetBrains Mono', monospace;
-  padding-top: 1px;
+  border-radius: 3px;
+  transition: background 0.1s;
 }
 
+.toggleVisible {
+  cursor: pointer;
+}
+
+.toggleVisible:hover { background: var(--color-surface-active); }
+
+/* ── 마커 뱃지 ── */
 .marker {
-  min-width: 14px;
-  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  font-size: 11px;
   font-weight: 700;
   font-family: monospace;
   user-select: none;
+  flex-shrink: 0;
 }
 
-.markerAdded   { color: #1D9E75; }
-.markerRemoved { color: #E24B4A; }
-.markerChanged { color: #BA7517; }
-
-.content {
-  flex: 1;
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 2px;
-  min-width: 0;
-  overflow-wrap: break-word;
+.markerHidden {
+  visibility: hidden;
 }
 
+.marker_added   { background: rgba(34,  197, 94,  0.18); color: #16a34a; border: 1px solid rgba(34,  197, 94,  0.3); }
+.marker_removed { background: rgba(239, 68,  68,  0.18); color: #dc2626; border: 1px solid rgba(239, 68,  68,  0.3); }
+.marker_changed { background: rgba(234, 179, 8,   0.18); color: #ca8a04; border: 1px solid rgba(234, 179, 8,   0.3); }
+
+/* dark mode 마커 */
+@media (prefers-color-scheme: dark) {
+  .marker_added   { background: rgba(34,  197, 94,  0.22); color: #4ade80; }
+  .marker_removed { background: rgba(239, 68,  68,  0.22); color: #f87171; }
+  .marker_changed { background: rgba(234, 179, 8,   0.22); color: #fbbf24; }
+}
+
+/* ── 키 이름 ── */
 .key {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
   color: #185FA5;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.keyBold {
+  font-weight: 600;
 }
 
 @media (prefers-color-scheme: dark) {
   .key { color: #85B7EB; }
 }
 
-.colon {
-  font-family: monospace;
-  font-size: 12px;
-  color: var(--color-text-secondary);
+/* ── 값 영역 ── */
+.values {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  flex-shrink: 0;
+  max-width: 55%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.absent {
-  font-size: 12px;
+.arrow {
+  font-size: 11px;
   color: var(--color-text-secondary);
-  opacity: 0.4;
+  flex-shrink: 0;
 }
 
+/* ── 자식 카운트 (객체 노드) ── */
+.childCount {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--color-text-secondary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--color-surface-active);
+  border-radius: 10px;
+  padding: 1px 8px;
+}
+
+/* ── 빈 상태 ── */
 .empty {
   padding: 3rem;
   text-align: center;
@@ -147,4 +230,5 @@
   font-size: 14px;
   border: 1px solid var(--color-border);
   border-radius: 10px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }

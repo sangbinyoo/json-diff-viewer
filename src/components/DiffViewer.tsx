@@ -1,43 +1,136 @@
-import React, { useRef, useCallback } from 'react'
-import type { DiffRow, SortMode } from '../types/diff'
+import React, { useState, useMemo } from 'react'
+import type { DiffRow, SortMode, FilterMode } from '../types/diff'
+import type { TreeNode } from '../utils/buildTree'
+import { buildTree } from '../utils/buildTree'
 import { ValueToken } from './ValueToken'
 import styles from './DiffViewer.module.css'
 
 interface Props {
   rows: DiffRow[]
   sortMode: SortMode
+  filterMode: FilterMode
   onSortChange: (mode: SortMode) => void
 }
 
-const MARKER: Record<string, { symbol: string; cls: string }> = {
-  added:     { symbol: '+', cls: styles.markerAdded },
-  removed:   { symbol: '−', cls: styles.markerRemoved },
-  changed:   { symbol: '~', cls: styles.markerChanged },
-  unchanged: { symbol: ' ', cls: '' },
+// ── 마커 설정 ──────────────────────────────────────────────
+const MARKER_MAP = {
+  added:     { symbol: '+', label: 'added' },
+  removed:   { symbol: '-', label: 'removed' },
+  changed:   { symbol: 'M', label: 'changed' },
+  unchanged: { symbol: ' ', label: 'unchanged' },
+} as const
+
+// ── 단일 트리 노드 컴포넌트 ────────────────────────────────
+interface TreeNodeRowProps {
+  node: TreeNode
+  depth: number
+  filterMode: FilterMode
 }
 
-/**
- * 좌우 나란히 diff 뷰.
- * 두 스크롤 컨테이너를 동기화하고, 키 경로 깊이를 들여쓰기로 표현합니다.
- */
-export const DiffViewer: React.FC<Props> = ({ rows, sortMode, onSortChange }) => {
-  const leftRef  = useRef<HTMLDivElement>(null)
-  const rightRef = useRef<HTMLDivElement>(null)
-  const isSyncing = useRef(false)
+const TreeNodeRow: React.FC<TreeNodeRowProps> = ({ node, depth, filterMode }) => {
+  const [expanded, setExpanded] = useState(true)
 
-  const syncLeft = useCallback(() => {
-    if (isSyncing.current || !rightRef.current || !leftRef.current) return
-    isSyncing.current = true
-    rightRef.current.scrollTop = leftRef.current.scrollTop
-    isSyncing.current = false
-  }, [])
+  const hasChildren = node.children.length > 0
+  const marker = MARKER_MAP[node.type]
 
-  const syncRight = useCallback(() => {
-    if (isSyncing.current || !leftRef.current || !rightRef.current) return
-    isSyncing.current = true
-    leftRef.current.scrollTop = rightRef.current.scrollTop
-    isSyncing.current = false
-  }, [])
+  // 필터 적용: unchanged 필터가 아닌데 이 노드와 자손 모두 unchanged면 숨김
+  const isVisible = (() => {
+    if (filterMode === 'all') return true
+    if (filterMode === 'unchanged') return node.type === 'unchanged' && !node.hasChangedDescendant
+    // changed/added/removed 필터: 해당 type 이거나 그런 자손을 가진 경우 표시
+    if (node.type === filterMode) return true
+    if (hasChildren && node.hasChangedDescendant) return true
+    return false
+  })()
+
+  if (!isVisible) return null
+
+  const indentPx = depth * 20
+
+  return (
+    <>
+      <div
+        className={`${styles.row} ${styles[`row_${node.type}`]}`}
+        style={{ paddingLeft: indentPx + 8 }}
+      >
+        {/* 토글 버튼 */}
+        <span
+          className={`${styles.toggle} ${hasChildren ? styles.toggleVisible : ''}`}
+          onClick={() => hasChildren && setExpanded(v => !v)}
+          aria-label={expanded ? '접기' : '펼치기'}
+          role={hasChildren ? 'button' : undefined}
+          tabIndex={hasChildren ? 0 : undefined}
+          onKeyDown={e => e.key === 'Enter' && hasChildren && setExpanded(v => !v)}
+        >
+          {hasChildren ? (expanded ? '▾' : '▸') : ''}
+        </span>
+
+        {/* 변경 마커 뱃지 */}
+        <span
+          className={`${styles.marker} ${node.type !== 'unchanged' ? styles[`marker_${node.type}`] : styles.markerHidden}`}
+          aria-label={marker.label}
+        >
+          {marker.symbol}
+        </span>
+
+        {/* 키 이름 */}
+        <span className={`${styles.key} ${hasChildren ? styles.keyBold : ''}`}>
+          {node.key}
+        </span>
+
+        {/* 값 표시 */}
+        {!hasChildren && (
+          <span className={styles.values}>
+            {node.type === 'changed' ? (
+              <>
+                <ValueToken value={node.aVal} highlight="removed" />
+                <span className={styles.arrow}>→</span>
+                <ValueToken value={node.bVal} highlight="added" />
+              </>
+            ) : node.type === 'added' ? (
+              <ValueToken value={node.bVal} highlight="added" />
+            ) : node.type === 'removed' ? (
+              <ValueToken value={node.aVal} highlight="removed" />
+            ) : (
+              <ValueToken value={node.aVal} />
+            )}
+          </span>
+        )}
+
+        {/* 객체 노드: 자식 카운트 표시 */}
+        {hasChildren && (
+          <span className={styles.childCount}>
+            {node.children.length}개 키
+          </span>
+        )}
+      </div>
+
+      {/* 자식 노드 재귀 렌더 */}
+      {hasChildren && expanded && node.children.map(child => (
+        <TreeNodeRow
+          key={child.path}
+          node={child}
+          depth={depth + 1}
+          filterMode={filterMode}
+        />
+      ))}
+    </>
+  )
+}
+
+// ── 메인 DiffViewer ────────────────────────────────────────
+export const DiffViewer: React.FC<Props> = ({ rows, sortMode, filterMode, onSortChange }) => {
+  const tree = useMemo(() => buildTree(rows), [rows])
+
+  // 루트 레벨 정렬
+  const SORT_PRIORITY: Record<string, number> = { removed: 0, changed: 1, added: 2, unchanged: 3 }
+
+  const sortedTree = useMemo(() => {
+    const copy = [...tree]
+    if (sortMode === 'alpha') return copy.sort((a, b) => a.key.localeCompare(b.key))
+    if (sortMode === 'type') return copy.sort((a, b) => SORT_PRIORITY[a.type] - SORT_PRIORITY[b.type])
+    return copy
+  }, [tree, sortMode])
 
   if (rows.length === 0) {
     return (
@@ -49,96 +142,55 @@ export const DiffViewer: React.FC<Props> = ({ rows, sortMode, onSortChange }) =>
 
   return (
     <div className={styles.wrapper}>
-      {/* 정렬 컨트롤 */}
+      {/* 툴바 */}
       <div className={styles.toolbar}>
-        <label htmlFor="sortMode" className={styles.sortLabel}>정렬:</label>
-        <select
-          id="sortMode"
-          value={sortMode}
-          onChange={e => onSortChange(e.target.value as SortMode)}
-          className={styles.sortSelect}
-        >
-          <option value="alpha">키 이름순</option>
-          <option value="type">변경 유형순</option>
-          <option value="original">원본 순서</option>
-        </select>
+        {/* 범례 */}
+        <div className={styles.legend}>
+          <span className={`${styles.legendItem} ${styles.legendAdded}`}>
+            <span className={styles.legendMarker}>+</span> 추가
+          </span>
+          <span className={`${styles.legendItem} ${styles.legendRemoved}`}>
+            <span className={styles.legendMarker}>-</span> 삭제
+          </span>
+          <span className={`${styles.legendItem} ${styles.legendChanged}`}>
+            <span className={styles.legendMarker}>M</span> 변경
+          </span>
+        </div>
+
+        {/* 정렬 */}
+        <div className={styles.sortControl}>
+          <label htmlFor="sortMode" className={styles.sortLabel}>정렬</label>
+          <select
+            id="sortMode"
+            value={sortMode}
+            onChange={e => onSortChange(e.target.value as SortMode)}
+            className={styles.sortSelect}
+          >
+            <option value="alpha">키 이름순</option>
+            <option value="type">변경 유형순</option>
+            <option value="original">원본 순서</option>
+          </select>
+        </div>
+
         <span className={styles.rowCount}>{rows.length}개 항목</span>
       </div>
 
-      {/* diff 테이블 */}
-      <div className={styles.grid}>
-        {/* 헤더 */}
-        <div className={styles.colHeader}>
-          <span className={styles.colLabel}>파일 A (기준)</span>
-        </div>
-        <div className={styles.divider} aria-hidden="true" />
-        <div className={styles.colHeader}>
-          <span className={styles.colLabel}>파일 B (비교)</span>
-        </div>
+      {/* 컬럼 헤더 */}
+      <div className={styles.colHeader}>
+        <span>프로퍼티</span>
+        <span>값</span>
+      </div>
 
-        {/* 좌측 */}
-        <div className={styles.lines} ref={leftRef} onScroll={syncLeft}>
-          {rows.map((row, i) => {
-            const depth = row.path.split('.').length - 1
-            const key   = row.path.split('.').pop() ?? row.path
-            const m     = MARKER[row.type]
-            const lineClass = row.type === 'removed' ? styles.lineRemoved
-                            : row.type === 'changed'  ? styles.lineChanged
-                            : row.type === 'unchanged' ? styles.lineUnchanged
-                            : styles.lineEmpty
-
-            return (
-              <div key={`a-${i}`} className={`${styles.line} ${lineClass}`}>
-                <span className={styles.lineNum}>{i + 1}</span>
-                <span className={`${styles.marker} ${m.cls}`}>{m.symbol}</span>
-                <span className={styles.content} style={{ paddingLeft: depth * 12 }}>
-                  <span className={styles.key}>"{key}"</span>
-                  <span className={styles.colon}>: </span>
-                  {row.type !== 'added'
-                    ? <ValueToken
-                        value={row.aVal}
-                        highlight={row.type === 'removed' ? 'removed' : row.type === 'changed' ? 'changed' : null}
-                      />
-                    : <span className={styles.absent}>—</span>
-                  }
-                </span>
-              </div>
-            )
-          })}
-        </div>
-
-        <div className={styles.divider} aria-hidden="true" />
-
-        {/* 우측 */}
-        <div className={styles.lines} ref={rightRef} onScroll={syncRight}>
-          {rows.map((row, i) => {
-            const depth = row.path.split('.').length - 1
-            const key   = row.path.split('.').pop() ?? row.path
-            const m     = MARKER[row.type]
-            const lineClass = row.type === 'added'   ? styles.lineAdded
-                            : row.type === 'changed'  ? styles.lineChanged
-                            : row.type === 'unchanged' ? styles.lineUnchanged
-                            : styles.lineEmpty
-
-            return (
-              <div key={`b-${i}`} className={`${styles.line} ${lineClass}`}>
-                <span className={styles.lineNum}>{i + 1}</span>
-                <span className={`${styles.marker} ${m.cls}`}>{m.symbol}</span>
-                <span className={styles.content} style={{ paddingLeft: depth * 12 }}>
-                  <span className={styles.key}>"{key}"</span>
-                  <span className={styles.colon}>: </span>
-                  {row.type !== 'removed'
-                    ? <ValueToken
-                        value={row.bVal}
-                        highlight={row.type === 'added' ? 'added' : row.type === 'changed' ? 'changed' : null}
-                      />
-                    : <span className={styles.absent}>—</span>
-                  }
-                </span>
-              </div>
-            )
-          })}
-        </div>
+      {/* 트리 */}
+      <div className={styles.tree} role="tree">
+        {sortedTree.map(node => (
+          <TreeNodeRow
+            key={node.path}
+            node={node}
+            depth={0}
+            filterMode={filterMode}
+          />
+        ))}
       </div>
     </div>
   )
