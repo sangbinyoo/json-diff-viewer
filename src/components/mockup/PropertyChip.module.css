@@ -1,0 +1,20 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: default;
+  white-space: nowrap;
+}
+
+/* 변경 — 노랑 */
+.changed   { background: #FAEEDA; color: #854F0B; }
+/* 삭제 — 빨강 */
+.removed   { background: #FCEBEB; color: #A32D2D; }
+/* 추가 — 초록 */
+.added     { background: #EAF3DE; color: #3B6D11; }
+/* 동일 — 회색 */
+.unchanged { background: var(--color-surface); color: var(--color-text-secondary); }
