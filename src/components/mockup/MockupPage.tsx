@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Toolbar } from './Toolbar'
 import { FilePanel } from './FilePanel'
 import { ResultPanel } from './ResultPanel'
@@ -27,22 +27,52 @@ const SAMPLE_NODES: ResultNode[] = [
 
 export const MockupPage: React.FC = () => {
   const [sortValue, setSortValue] = useState('key')
+  const ref = useRef<HTMLInputElement>(null);
+  const upldateButton = () =>{
+    if(!ref.current) return;
+    ref.current.click();
+  }
+
+  const [fileContents, setFileContents] = useState<string[]>([]);
+  const [fileNames, setFileNames] = useState<string[]>([]);
+  const handleUpload = (event:React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if(!files) return
+    if(files.length !== 2) {
+      alert('Please select exactly 2 files.');
+      setFileContents([]);
+      setFileNames([]);
+      event.target.value = '';
+      return;
+    }
+    for(let i=0; i<files.length; i++){
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const content = e.target?.result as string;
+        setFileContents(prev => [...prev, content]);
+      }
+      setFileNames(prev => [...prev, files[i].name]);
+      reader.readAsText(files[i])
+    }
+  }
 
   return (
     <div className={styles.page}>
       <h1 className={styles.title}>JSON Comparator</h1>
-
+      <input onChange={(event:React.ChangeEvent<HTMLInputElement>)=>{
+        handleUpload(event);
+      }} type="file" multiple ref={ref} hidden />
       <Toolbar
         sortValue={sortValue}
         onSortChange={setSortValue}
-        onUpload={() => alert('Upload 클릭')}
+        onUpload={() => upldateButton() }
         onCompare={() => alert('Compare 클릭')}
         onExport={() => alert('Export 클릭')}
       />
 
       <main className={styles.grid}>
-        <FilePanel label="origin file" />
-        <FilePanel label="target file" />
+        <FilePanel label="origin file" fileName={fileNames[0]} children={fileContents[0]} />
+        <FilePanel label="target file" fileName={fileNames[1]} children={fileContents[1]} />
         <ResultPanel nodes={SAMPLE_NODES} />
       </main>
     </div>

@@ -14,9 +14,8 @@ interface Props {
  */
 export const FilePanel: React.FC<Props> = ({ label, fileName, children }) => (
   <section className={styles.panel} aria-label={label}>
-    <span className={styles.label}>{label}</span>
+    <span className={styles.label}>{label} : {fileName}</span>
     <div className={styles.box}>
-      {fileName && <p className={styles.fileName}>{fileName}</p>}
       {children}
     </div>
   </section>
