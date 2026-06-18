@@ -1,29 +1,10 @@
 import React, { useRef, useState } from 'react'
 import { Toolbar } from './Toolbar'
 import { FilePanel } from './FilePanel'
-import { ResultPanel } from './ResultPanel'
-import type { ResultNode } from './ResultPanel'
+import { ResultNode, ResultPanel } from './ResultPanel'
 import styles from './MockupPage.module.css'
+import { getResultNodes } from '../../utils/getResultNodes'
 
-/**
- * 피그마 디자인 기반 목업 페이지.
- * 실제 diff 로직과 연결하기 전 UI 레이아웃·스타일을 확인하는 용도입니다.
- * 데이터는 하드코딩된 샘플을 사용합니다.
- */
-
-const SAMPLE_NODES: ResultNode[] = [
-  { key: 'name',     type: 'changed' },
-  { key: 'birthday', type: 'removed' },
-  {
-    key: 'age',
-    type: 'added',
-    children: [
-      { key: 'props',  type: 'added' },
-      { key: 'props2', type: 'added' },
-      { key: 'month',  type: 'added' },
-    ],
-  },
-]
 
 export const MockupPage: React.FC = () => {
   const [sortValue, setSortValue] = useState('key')
@@ -35,6 +16,8 @@ export const MockupPage: React.FC = () => {
 
   const [fileContents, setFileContents] = useState<string[]>([]);
   const [fileNames, setFileNames] = useState<string[]>([]);
+
+  // 파일 업로드 핸들러
   const handleUpload = (event:React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if(!files) return
@@ -55,6 +38,14 @@ export const MockupPage: React.FC = () => {
       reader.readAsText(files[i])
     }
   }
+  const [allNodes, setAllNodes] = useState<ResultNode[]>([]);
+  //파일 비교 핸들러
+  const handleCompare = () => {
+    const originObj = JSON.parse(fileContents[0]);
+    const targetObj = JSON.parse(fileContents[1]);
+    const nodes = getResultNodes(originObj, targetObj, null as unknown as ResultNode);
+    setAllNodes(nodes);
+  }
 
   return (
     <div className={styles.page}>
@@ -66,14 +57,14 @@ export const MockupPage: React.FC = () => {
         sortValue={sortValue}
         onSortChange={setSortValue}
         onUpload={() => upldateButton() }
-        onCompare={() => alert('Compare 클릭')}
+        onCompare={() => handleCompare()}
         onExport={() => alert('Export 클릭')}
       />
 
       <main className={styles.grid}>
         <FilePanel label="origin file" fileName={fileNames[0]} children={fileContents[0]} />
         <FilePanel label="target file" fileName={fileNames[1]} children={fileContents[1]} />
-        <ResultPanel nodes={SAMPLE_NODES} />
+        <ResultPanel nodes={allNodes} />
       </main>
     </div>
   )

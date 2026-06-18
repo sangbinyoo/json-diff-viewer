@@ -1,5 +1,6 @@
 import React from 'react'
 import styles from './FilePanel.module.css'
+import { jsonPrettier } from '../../utils/jsonPrettier'
 
 interface Props {
   label: string
@@ -15,8 +16,8 @@ interface Props {
 export const FilePanel: React.FC<Props> = ({ label, fileName, children }) => (
   <section className={styles.panel} aria-label={label}>
     <span className={styles.label}>{label} : {fileName}</span>
-    <div className={styles.box}>
-      {children}
-    </div>
+    <pre className={styles.box}>
+      {jsonPrettier(children as string)}
+    </pre>
   </section>
 )

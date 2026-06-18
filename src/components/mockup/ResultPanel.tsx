@@ -1,10 +1,12 @@
 import React, { useState } from 'react'
-import type { DiffType } from '../../types/diff'
 import { PropertyChip } from './PropertyChip'
 import styles from './ResultPanel.module.css'
+export type DiffType = 'added' | 'removed' | 'changed' | 'unchanged'
 
 export interface ResultNode {
   key: string
+  title: string
+  value: {origin: any, target: any}
   type: DiffType
   children?: ResultNode[]
 }
@@ -34,7 +36,7 @@ const TreeRow: React.FC<TreeRowProps> = ({ node, depth }) => {
           {hasChildren ? (expanded ? '▾' : '▸') : ''}
         </span>
 
-        <PropertyChip label={node.key} type={node.type} />
+        <PropertyChip label={node.title} type={node.type} />
       </div>
 
       {hasChildren && expanded && node.children!.map(child => (
