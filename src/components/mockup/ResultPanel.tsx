@@ -36,7 +36,7 @@ const TreeRow: React.FC<TreeRowProps> = ({ node, depth }) => {
           {hasChildren ? (expanded ? '▾' : '▸') : ''}
         </span>
 
-        <PropertyChip label={node.title} type={node.type} />
+        <PropertyChip label={node.title} type={node.type} value={node.value} />
       </div>
 
       {hasChildren && expanded && node.children!.map(child => (
@@ -59,8 +59,6 @@ export const ResultPanel: React.FC<Props> = ({ nodes }) => (
     <p className={styles.header}>Compare result</p>
 
     <div className={styles.box} role="tree" aria-label="프로퍼티 트리">
-      <p className={styles.propLabel}>property</p>
-
       {nodes.map(node => (
         <TreeRow key={node.key} node={node} depth={0} />
       ))}

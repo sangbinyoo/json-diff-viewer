@@ -1,11 +1,12 @@
 import React from 'react'
-import type { DiffType } from '../../types/diff'
 import styles from './PropertyChip.module.css'
+import { DiffType } from './ResultPanel'
 
 interface Props {
   label: string
   type: DiffType
   title?: string
+  value: { origin: any; target: any }
 }
 
 const TYPE_CLASS: Record<DiffType, string> = {
@@ -22,15 +23,42 @@ const TYPE_TITLE: Record<DiffType, string> = {
   unchanged: '동일',
 }
 
+const VALUE_CLASS: Record<DiffType, string> = {
+  changed:   styles.valueChanged,
+  removed:   styles.valueRemoved,
+  added:     styles.valueAdded,
+  unchanged: styles.valueUnchanged,
+}
+
 /**
  * 프로퍼티 이름을 diff 유형에 맞는 색상 칩으로 렌더링합니다.
  * 변경(노랑) / 삭제(빨강) / 추가(초록) / 동일(회색)
  */
-export const PropertyChip: React.FC<Props> = ({ label, type, title }) => (
-  <span
-    className={`${styles.chip} ${TYPE_CLASS[type]}`}
-    title={title ?? TYPE_TITLE[type]}
-  >
-    {label}
-  </span>
-)
+export const PropertyChip: React.FC<Props> = ({ label, type, title, value }) => {
+  const valueFormatter = (val: { origin: any; target: any }) => {
+    if(typeof val.origin == 'object' || typeof val.target == 'object') return ""
+    switch(type){
+      case 'changed':
+        return `${val.origin} → ${val.target}`
+      case 'removed':
+        return val.origin
+      case 'added':
+        return val.target
+      case 'unchanged':
+        return val.origin
+    }
+  }
+  return (
+  <>
+    <span
+      className={`${styles.chip} ${TYPE_CLASS[type]}`}
+      title={title ?? TYPE_TITLE[type]}
+    >
+      {label}
+    </span>
+    <span className={`${styles.value} ${VALUE_CLASS[type]}`}>
+      {valueFormatter(value)}
+    </span>
+  </>
+  )
+}

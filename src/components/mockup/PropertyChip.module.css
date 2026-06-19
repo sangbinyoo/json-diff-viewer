@@ -1,3 +1,4 @@
+/* ── 칩 (프로퍼티명) ── */
 .chip {
   display: inline-flex;
   align-items: center;
@@ -8,13 +9,48 @@
   font-weight: 500;
   cursor: default;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
-/* 변경 — 노랑 */
 .changed   { background: #FAEEDA; color: #854F0B; }
-/* 삭제 — 빨강 */
 .removed   { background: #FCEBEB; color: #A32D2D; }
-/* 추가 — 초록 */
 .added     { background: #EAF3DE; color: #3B6D11; }
-/* 동일 — 회색 */
-.unchanged { background: var(--color-surface); color: var(--color-text-secondary); }
+.unchanged { background: var(--color-surface, #f7f7f6); color: #6b6b65; }
+
+/* ── 우측 고정 값 영역 ── */
+.value {
+  /* 칩과 값 사이 남은 공간을 밀어서 우측 끝으로 이동 */
+  margin-left: auto;
+  flex-shrink: 0;
+
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 12px;
+  padding: 2px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 240px;
+}
+
+/* type별 값 색상 — 칩 색상과 동일 계열 */
+.valueChanged {
+  color: #854F0B;
+  background: rgba(250, 238, 218, 0.6);
+}
+
+.valueRemoved {
+  color: #A32D2D;
+  background: rgba(252, 235, 235, 0.6);
+  text-decoration: line-through;
+}
+
+.valueAdded {
+  color: #3B6D11;
+  background: rgba(234, 243, 222, 0.6);
+}
+
+.valueUnchanged {
+  color: #6b6b65;
+  background: transparent;
+}
