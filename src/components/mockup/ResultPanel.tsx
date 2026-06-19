@@ -56,8 +56,6 @@ interface Props {
  */
 export const ResultPanel: React.FC<Props> = ({ nodes }) => (
   <section className={styles.panel} aria-label="비교 결과">
-    <p className={styles.header}>Compare result</p>
-
     <div className={styles.box} role="tree" aria-label="프로퍼티 트리">
       {nodes.map(node => (
         <TreeRow key={node.key} node={node} depth={0} />
