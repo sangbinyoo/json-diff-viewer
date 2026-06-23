@@ -55,11 +55,14 @@ interface Props {
  * ResultNode 트리를 받아 접기/펼치기가 가능한 트리로 렌더링합니다.
  */
 export const ResultPanel: React.FC<Props> = ({ nodes }) => (
-  <section className={styles.panel} aria-label="비교 결과">
-    <div className={styles.box} role="tree" aria-label="프로퍼티 트리">
-      {nodes.map(node => (
-        <TreeRow key={node.key} node={node} depth={0} />
-      ))}
-    </div>
-  </section>
+  <>
+    <section className={styles.panel} aria-label="비교 결과">
+      <span className={styles.label}>Compare result</span>
+      <div className={styles.box} role="tree" aria-label="프로퍼티 트리">
+        {nodes.map(node => (
+          <TreeRow key={node.key} node={node} depth={0} />
+        ))}
+      </div>
+    </section>
+  </>
 )

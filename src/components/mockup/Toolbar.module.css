@@ -1,9 +1,23 @@
 .toolbar {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+/* ── 좌측: Upload(왼쪽 끝) + Compare(오른쪽 끝) ── */
+.leftGroup {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+/* ── 우측: Sort(왼쪽 끝) + Export(오른쪽 끝) ── */
+.rightGroup {
+  display: flex;
+  padding-left: 14px;
+  align-items: center;
+  justify-content: space-between;
 }
 
 /* Upload files */
@@ -15,15 +29,15 @@
   padding: 0 14px;
   border: 1.5px dashed rgba(0, 0, 0, 0.25);
   border-radius: 8px;
-  background: var(--color-surface);
-  color: var(--color-text-secondary);
+  background: var(--color-surface, #f7f7f6);
+  color: var(--color-text-secondary, #6b6b65);
   font-size: 13px;
   font-family: inherit;
   cursor: pointer;
   white-space: nowrap;
   transition: background 0.14s;
 }
-.btnUpload:hover { background: var(--color-surface-hover); }
+.btnUpload:hover { background: var(--color-surface-hover, #eeeeed); }
 .btnUpload svg {
   width: 15px;
   height: 15px;
@@ -58,15 +72,16 @@
 }
 .sortLabel {
   font-size: 13px;
-  color: var(--color-text-secondary);
+  color: var(--color-text-secondary, #6b6b65);
+  white-space: nowrap;
 }
 .sortSelect {
   height: 28px;
   padding: 0 8px;
   border-radius: 8px;
-  border: 1px solid var(--color-border);
-  background: var(--color-bg);
-  color: var(--color-text-primary);
+  border: 1px solid var(--color-border, rgba(0,0,0,0.12));
+  background: var(--color-bg, #fff);
+  color: var(--color-text-primary, #1a1a18);
   font-size: 13px;
   font-family: inherit;
   cursor: pointer;
@@ -74,7 +89,6 @@
 
 /* Export */
 .btnExport {
-  margin-left: auto;
   height: 34px;
   padding: 0 18px;
   border: none;

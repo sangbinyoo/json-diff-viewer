@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Toolbar } from './Toolbar'
 import { FilePanel } from './FilePanel'
 import { ResultNode, ResultPanel } from './ResultPanel'
@@ -16,6 +16,11 @@ export const MockupPage: React.FC = () => {
 
   const [fileContents, setFileContents] = useState<string[]>([]);
   const [fileNames, setFileNames] = useState<string[]>([]);
+
+  useEffect(() => {
+    if(fileContents.length === 2)
+      handleCompare();
+  }, [sortValue])
 
   // 파일 업로드 핸들러
   const handleUpload = (event:React.ChangeEvent<HTMLInputElement>) => {
@@ -43,7 +48,7 @@ export const MockupPage: React.FC = () => {
   const handleCompare = () => {
     const originObj = JSON.parse(fileContents[0]);
     const targetObj = JSON.parse(fileContents[1]);
-    const nodes = getResultNodes(originObj, targetObj, null as unknown as ResultNode);
+    const nodes = getResultNodes(originObj, targetObj, null as unknown as ResultNode, sortValue);
     setAllNodes(nodes);
   }
 

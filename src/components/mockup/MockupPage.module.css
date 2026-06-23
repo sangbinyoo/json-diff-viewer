@@ -1,8 +1,12 @@
+/* 페이지 전체를 뷰포트 높이로 고정 — 전체 스크롤 없음 */
 .page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;         /* 페이지 자체 스크롤 차단 */
+  padding: 20px 24px;
   background: var(--color-bg);
-  min-height: 100vh;
-  width: 100%;
-  padding: 28px 24px;
+  box-sizing: border-box;
 }
 
 .title {
@@ -10,13 +14,24 @@
   font-weight: 500;
   color: var(--color-text-primary);
   margin-bottom: 18px;
+  flex-shrink: 0;           /* 타이틀은 고정 */
 }
 
+/* 툴바도 고정 */
+.toolbarWrapper {
+  flex-shrink: 0;
+}
+
+/* 그리드는 남은 세로 공간 모두 차지 */
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr 2fr;
   gap: 14px;
-  align-items: start;
+  align-items: stretch;     /* 컬럼 높이 동일하게 */
+
+  flex: 1;                  /* 남은 높이 모두 차지 */
+  min-height: 0;            /* flex 자식 overflow 허용 */
+  overflow: hidden;
 }
 
 @media (max-width: 900px) {
@@ -31,6 +46,7 @@
 @media (max-width: 480px) {
   .grid {
     grid-template-columns: 1fr;
+    overflow-y: auto;       /* 모바일은 그리드 자체 스크롤 */
   }
   .grid > :last-child {
     grid-column: unset;
