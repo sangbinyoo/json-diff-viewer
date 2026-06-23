@@ -7,7 +7,7 @@ import { getResultNodes } from '../../utils/getResultNodes'
 
 
 export const MockupPage: React.FC = () => {
-  const [sortValue, setSortValue] = useState('key')
+  const [sortValue, setSortValue] = useState('original')
   const ref = useRef<HTMLInputElement>(null);
   const upldateButton = () =>{
     if(!ref.current) return;
@@ -16,23 +16,24 @@ export const MockupPage: React.FC = () => {
 
   const [fileContents, setFileContents] = useState<string[]>([]);
   const [fileNames, setFileNames] = useState<string[]>([]);
-
+  const [disableBtnCompare, setDisableBtnCompare] = useState<boolean>(true);
+  const [disableBtnExport, setDisableBtnExport] = useState<boolean>(true);
+  //sort type변경시 다시 비교
   useEffect(() => {
     if(fileContents.length === 2)
-      handleCompare();
+      compareFiles();
   }, [sortValue])
 
   // 파일 업로드 핸들러
   const handleUpload = (event:React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if(!files) return
-    if(files.length !== 2) {
+    if(!files || files.length !== 2) {
       alert('Please select exactly 2 files.');
-      setFileContents([]);
-      setFileNames([]);
       event.target.value = '';
       return;
     }
+
+    clearScreen();
     for(let i=0; i<files.length; i++){
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -42,14 +43,32 @@ export const MockupPage: React.FC = () => {
       setFileNames(prev => [...prev, files[i].name]);
       reader.readAsText(files[i])
     }
+    setDisableBtnCompare(false);
   }
   const [allNodes, setAllNodes] = useState<ResultNode[]>([]);
-  //파일 비교 핸들러
-  const handleCompare = () => {
+
+  //파일 비교 함수
+  const compareFiles = () => {
     const originObj = JSON.parse(fileContents[0]);
     const targetObj = JSON.parse(fileContents[1]);
     const nodes = getResultNodes(originObj, targetObj, null as unknown as ResultNode, sortValue);
     setAllNodes(nodes);
+    setDisableBtnExport(false);
+  }
+
+  //Json 내보내기 함수
+  const exportToJson = () => {
+    const json = JSON.stringify(allNodes, null, 2);
+    const blob = new Blob([json], { type: 'application/json' }); 
+  }
+
+  //화면 초기화 함수
+  const clearScreen = () =>{
+      setFileContents([]);
+      setFileNames([]);
+      setAllNodes([]);
+      setDisableBtnCompare(true);
+      setDisableBtnExport(true)
   }
 
   return (
@@ -60,10 +79,12 @@ export const MockupPage: React.FC = () => {
       }} type="file" multiple ref={ref} hidden />
       <Toolbar
         sortValue={sortValue}
+        disableBtnCompare={disableBtnCompare}
+        disableBtnExport={disableBtnExport}
         onSortChange={setSortValue}
         onUpload={() => upldateButton() }
-        onCompare={() => handleCompare()}
-        onExport={() => alert('Export 클릭')}
+        onCompare={() => compareFiles()}
+        onExport={() => exportToJson()}
       />
 
       <main className={styles.grid}>

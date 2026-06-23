@@ -7,7 +7,8 @@ interface Props {
   onUpload: () => void
   onCompare: () => void
   onExport: () => void
-  compareDisabled?: boolean
+  disableBtnCompare?: boolean,
+  disableBtnExport?: boolean,
 }
 
 export const Toolbar: React.FC<Props> = ({
@@ -16,7 +17,8 @@ export const Toolbar: React.FC<Props> = ({
   onUpload,
   onCompare,
   onExport,
-  compareDisabled = false,
+  disableBtnCompare = true,
+  disableBtnExport = true,
 }) => (
  <div className={styles.toolbar} role="toolbar" aria-label="메인 도구모음">
  
@@ -34,7 +36,7 @@ export const Toolbar: React.FC<Props> = ({
       <button
         className={styles.btnCompare}
         onClick={onCompare}
-        disabled={compareDisabled}
+        disabled={disableBtnCompare}
       >
         Compare
       </button>
@@ -56,7 +58,7 @@ export const Toolbar: React.FC<Props> = ({
         </select>
       </div>
  
-      <button className={styles.btnExport} onClick={onExport}>
+      <button className={styles.btnExport} onClick={onExport} disabled={disableBtnExport}>
         Export
       </button>
     </div>
