@@ -34,7 +34,8 @@ const VALUE_CLASS: Record<DiffType, string> = {
  * 프로퍼티 이름을 diff 유형에 맞는 색상 칩으로 렌더링합니다.
  * 변경(노랑) / 삭제(빨강) / 추가(초록) / 동일(회색)
  */
-export const PropertyChip: React.FC<Props> = ({ label, type, title, value }) => {
+type ChipProps = Props & React.HTMLAttributes<HTMLSpanElement>
+export const PropertyChip: React.FC<ChipProps> = ({ label, type, title, value, ...rest }) => {
   const valueFormatter = (val: { origin: any; target: any }) => {
     if(typeof val.origin == 'object' || typeof val.target == 'object') return ""
     switch(type){
@@ -53,6 +54,7 @@ export const PropertyChip: React.FC<Props> = ({ label, type, title, value }) => 
     <span
       className={`${styles.chip} ${TYPE_CLASS[type]}`}
       title={title ?? TYPE_TITLE[type]}
+      {...rest}
     >
       {label}
     </span>

@@ -10,8 +10,12 @@
   cursor: default;
   white-space: nowrap;
   flex-shrink: 0;
+  cursor: grab;
+  user-select: none;
 }
-
+.chip:active{
+  cursor: grabbing;
+}
 .changed   { background: #FAEEDA; color: #854F0B; }
 .removed   { background: #FCEBEB; color: #A32D2D; }
 .added     { background: #EAF3DE; color: #3B6D11; }
