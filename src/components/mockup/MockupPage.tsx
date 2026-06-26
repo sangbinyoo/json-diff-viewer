@@ -60,6 +60,16 @@ export const MockupPage: React.FC = () => {
   const exportToJson = () => {
     const json = JSON.stringify(allNodes, null, 2);
     const blob = new Blob([json], { type: 'application/json' }); 
+
+    // 다운로드 트리거
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `diff-result-${new Date().toISOString().slice(0, 10)}.json`
+    a.click()
+
+    // 메모리 해제
+    URL.revokeObjectURL(url)
   }
 
   //화면 초기화 함수
