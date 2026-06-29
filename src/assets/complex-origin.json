@@ -1,0 +1,119 @@
+{
+  "appName": "MyApp",
+  "version": "2.1.0",
+  "buildNumber": 4821,
+  "environment": "production",
+  "debug": false,
+  "region": "ap-northeast-2",
+  "timezone": "Asia/Seoul",
+  "language": "ko",
+  "maxConnections": 100,
+  "requestTimeoutMs": 5000,
+  "retryCount": 3,
+  "maintenanceMode": false,
+  "termsVersion": "v2.1",
+  "contactEmail": "support@myapp.com",
+  "appConfig": {
+    "allowedOrigins": ["https://myapp.com", "https://api.myapp.com"],
+    "featureFlags": {
+      "darkMode": true,
+      "betaEditor": false,
+      "analyticsV2": true,
+      "newOnboarding": false
+    },
+    "maintenance": {
+      "enabled": false,
+      "message": "점검 중입니다.",
+      "scheduledAt": "2024-12-01T00:00:00Z"
+    }
+  },
+  "database": {
+    "primary": {
+      "host": "db-primary.internal",
+      "port": 5432,
+      "name": "myapp_prod",
+      "poolSize": 20,
+      "ssl": true,
+      "credentials": {
+        "username": "app_user",
+        "passwordSecret": "db/prod/password",
+        "authMethod": "scram-sha-256",
+        "rotateEveryDays": 90
+      }
+    },
+    "replica": {
+      "host": "db-replica.internal",
+      "port": 5432,
+      "poolSize": 10,
+      "ssl": true,
+      "readOnly": true
+    },
+    "redis": {
+      "host": "redis.internal",
+      "port": 6379,
+      "db": 0,
+      "ttlSeconds": 3600,
+      "cluster": false
+    }
+  },
+  "services": {
+    "auth": {
+      "provider": "internal",
+      "jwtSecret": "secrets/jwt",
+      "accessTokenTtl": 900,
+      "refreshTokenTtl": 604800,
+      "mfa": {
+        "enabled": false,
+        "methods": ["totp"]
+      }
+    },
+    "email": {
+      "provider": "sendgrid",
+      "fromAddress": "no-reply@myapp.com",
+      "fromName": "MyApp",
+      "templates": {
+        "welcome": "tmpl_welcome_v1",
+        "resetPassword": "tmpl_reset_v2",
+        "invoice": "tmpl_invoice_v1"
+      }
+    },
+    "storage": {
+      "provider": "s3",
+      "bucket": "myapp-prod-assets",
+      "region": "ap-northeast-2",
+      "maxFileSizeMb": 10,
+      "allowedMimeTypes": ["image/jpeg", "image/png", "application/pdf"]
+    },
+    "payment": {
+      "provider": "stripe",
+      "webhookSecret": "secrets/stripe-webhook",
+      "currency": "KRW",
+      "trialDays": 14
+    }
+  },
+  "monitoring": {
+    "logging": {
+      "level": "warn",
+      "format": "json",
+      "retentionDays": 30,
+      "destinations": ["cloudwatch", "s3"]
+    },
+    "metrics": {
+      "enabled": true,
+      "provider": "datadog",
+      "sampleRate": 0.1,
+      "tags": ["env:prod", "app:myapp"]
+    },
+    "alerts": {
+      "errorRateThreshold": 0.05,
+      "responseTimeMs": 2000,
+      "notifyChannels": ["slack", "email"]
+    }
+  },
+  "localization": {
+    "defaultLocale": "ko",
+    "supportedLocales": ["ko", "en", "ja"],
+    "dateFormat": "YYYY-MM-DD",
+    "currency": "KRW"
+  }
+}

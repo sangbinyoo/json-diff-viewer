@@ -1,0 +1,142 @@
+{
+  "appName": "MyApp",
+  "version": "3.0.0",
+  "buildNumber": 5100,
+  "environment": "production",
+  "debug": true,
+  "region": "ap-northeast-2",
+  "timezone": "UTC",
+  "language": "en",
+  "maxConnections": 300,
+  "requestTimeoutMs": 3000,
+  "retryCount": 3,
+  "maintenanceMode": true,
+  "contactEmail": "hello@myapp.com",
+  "releaseNote": "v3.0.0 major release",
+  "supportedPlatforms": ["web", "ios", "android"],
+  "licenseKey": "LK-PROD-2025-XXXX",
+  "appConfig": {
+    "allowedOrigins": ["https://myapp.com", "https://api.myapp.com", "https://admin.myapp.com"],
+    "featureFlags": {
+      "darkMode": true,
+      "betaEditor": true,
+      "analyticsV2": false,
+      "newOnboarding": true,
+      "aiAssistant": true
+    },
+    "maintenance": {
+      "enabled": true,
+      "message": "시스템 업그레이드 중입니다. 잠시만 기다려주세요.",
+      "scheduledAt": "2025-03-15T02:00:00Z",
+      "estimatedDurationMin": 120
+    }
+  },
+  "database": {
+    "primary": {
+      "host": "db-primary-v2.internal",
+      "port": 5432,
+      "name": "myapp_prod",
+      "poolSize": 50,
+      "ssl": true,
+      "credentials": {
+        "username": "app_user_v2",
+        "passwordSecret": "db/prod/password-v2",
+        "authMethod": "scram-sha-256",
+        "rotateEveryDays": 30
+      }
+    },
+    "replica": {
+      "host": "db-replica.internal",
+      "port": 5432,
+      "poolSize": 20,
+      "ssl": true,
+      "readOnly": true,
+      "replicaCount": 2
+    },
+    "redis": {
+      "host": "redis-cluster.internal",
+      "port": 6379,
+      "db": 0,
+      "ttlSeconds": 7200,
+      "cluster": true,
+      "clusterNodes": ["redis-1.internal", "redis-2.internal", "redis-3.internal"]
+    },
+    "elasticsearch": {
+      "host": "es.internal",
+      "port": 9200,
+      "index": "myapp_search",
+      "shards": 3,
+      "replicas": 1
+    }
+  },
+  "services": {
+    "auth": {
+      "provider": "keycloak",
+      "jwtSecret": "secrets/jwt-v2",
+      "accessTokenTtl": 1800,
+      "refreshTokenTtl": 2592000,
+      "mfa": {
+        "enabled": true,
+        "methods": ["totp", "sms", "email"]
+      }
+    },
+    "email": {
+      "provider": "ses",
+      "fromAddress": "hello@myapp.com",
+      "fromName": "MyApp Team",
+      "templates": {
+        "welcome": "tmpl_welcome_v3",
+        "resetPassword": "tmpl_reset_v2",
+        "invoice": "tmpl_invoice_v2",
+        "notification": "tmpl_notify_v1"
+      }
+    },
+    "storage": {
+      "provider": "s3",
+      "bucket": "myapp-prod-assets-v2",
+      "region": "ap-northeast-2",
+      "maxFileSizeMb": 50,
+      "allowedMimeTypes": ["image/jpeg", "image/png", "application/pdf", "video/mp4"],
+      "cdn": {
+        "enabled": true,
+        "domain": "cdn.myapp.com",
+        "ttlSeconds": 86400
+      }
+    },
+    "notification": {
+      "provider": "firebase",
+      "projectId": "myapp-prod",
+      "vapidKey": "secrets/vapid"
+    }
+  },
+  "monitoring": {
+    "logging": {
+      "level": "error",
+      "format": "json",
+      "retentionDays": 90,
+      "destinations": ["cloudwatch", "s3", "opensearch"]
+    },
+    "metrics": {
+      "enabled": true,
+      "provider": "datadog",
+      "sampleRate": 1.0,
+      "tags": ["env:prod", "app:myapp", "version:3.0.0"]
+    },
+    "alerts": {
+      "errorRateThreshold": 0.01,
+      "responseTimeMs": 1000,
+      "notifyChannels": ["slack", "pagerduty"]
+    },
+    "tracing": {
+      "enabled": true,
+      "provider": "jaeger",
+      "sampleRate": 0.05
+    }
+  },
+  "localization": {
+    "defaultLocale": "ko",
+    "supportedLocales": ["ko", "en", "ja", "zh", "es"],
+    "dateFormat": "YYYY-MM-DD",
+    "currency": "KRW"
+  }
+}

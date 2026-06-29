@@ -1,6 +1,7 @@
 import { ResultNode } from "../components/mockup";
 import { DiffType } from "../components/mockup/ResultPanel";
 
+export type SummaryResult = {added:number,removed:number,changed:number,unchanged:number};
 
 export function getDiffType(origin: any, target: any, key: string, parentNode: ResultNode): DiffType {
     
@@ -60,4 +61,17 @@ export function getResultNodes(origin: any, target: any,parentNode:ResultNode, s
 
 function isObject(origin: any, target: any): boolean {
     return typeof origin === 'object' && origin !== undefined && origin !== null || typeof target === 'object' && target !== undefined && target !== null;
+}
+
+
+export function getSummary(allNodes:ResultNode[], result:SummaryResult){
+    
+    allNodes.forEach(current=>{
+        result[current.type] += 1
+        if(current.children){
+            getSummary(current.children, result)
+        }
+    })
+
+
 }

@@ -3,8 +3,8 @@ import { Toolbar } from './Toolbar'
 import { FilePanel } from './FilePanel'
 import { ResultNode, ResultPanel } from './ResultPanel'
 import styles from './MockupPage.module.css'
-import { getResultNodes } from '../../utils/getResultNodes'
-
+import { getResultNodes, getSummary, SummaryResult } from '../../utils/ResultNode'
+import { exportToHtml } from '../ExportResultPanel'
 
 export const MockupPage: React.FC = () => {
   const [sortValue, setSortValue] = useState('original')
@@ -58,18 +58,11 @@ export const MockupPage: React.FC = () => {
 
   //Json 내보내기 함수
   const exportToJson = () => {
-    const json = JSON.stringify(allNodes, null, 2);
-    const blob = new Blob([json], { type: 'application/json' }); 
-
-    // 다운로드 트리거
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `diff-result-${new Date().toISOString().slice(0, 10)}.json`
-    a.click()
-
-    // 메모리 해제
-    URL.revokeObjectURL(url)
+    const summaryResult:SummaryResult={
+      added:0,removed:0,changed:0,unchanged:0
+    }
+    getSummary(allNodes, summaryResult);
+    exportToHtml(allNodes)
   }
 
   //화면 초기화 함수
