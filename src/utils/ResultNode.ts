@@ -1,5 +1,5 @@
-import { ResultNode } from "../components/mockup";
-import { DiffType } from "../components/mockup/ResultPanel";
+import { ResultNode } from "../components";
+import { DiffType } from "../components/MainLayout/ResultPanel/ResultPanel";
 
 export type SummaryResult = {added:number,removed:number,changed:number,unchanged:number};
 

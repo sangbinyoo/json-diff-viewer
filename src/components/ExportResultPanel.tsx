@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
-import type { ResultNode, DiffType } from './mockup/ResultPanel'
+import type { ResultNode, DiffType } from './MainLayout/ResultPanel/ResultPanel'
 
 // ── 색상 토큰 ─────────────────────────────────────────────
 const COLOR: Record<DiffType, { bg: string; text: string; badge: string }> = {

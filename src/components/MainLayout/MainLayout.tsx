@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { Toolbar } from './Toolbar'
-import { FilePanel } from './FilePanel'
-import { ResultNode, ResultPanel } from './ResultPanel'
-import styles from './MockupPage.module.css'
+import { Toolbar } from './ToolBar/Toolbar'
+import { FilePanel } from './FilePanel/FilePanel'
+import { ResultNode, ResultPanel } from './ResultPanel/ResultPanel'
+import styles from './MainLayout.module.css'
 import { getResultNodes, getSummary, SummaryResult } from '../../utils/ResultNode'
 import { exportToHtml } from '../ExportResultPanel'
 
-export const MockupPage: React.FC = () => {
+export const MainLayout: React.FC = () => {
   const [sortValue, setSortValue] = useState('original')
   const ref = useRef<HTMLInputElement>(null);
   const upldateButton = () =>{

@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from './FilePanel.module.css'
-import { jsonPrettier } from '../../utils/jsonPrettier'
+import { jsonPrettier } from '../../../utils/jsonPrettier'
 
 interface Props {
   label: string

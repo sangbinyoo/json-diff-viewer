@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { PropertyChip } from './PropertyChip'
+import { PropertyChip } from './PropertyChip/PropertyChip'
 import styles from './ResultPanel.module.css'
 export type DiffType = 'added' | 'removed' | 'changed' | 'unchanged'
 

@@ -1,10 +1,10 @@
 import React from 'react'
-import { MockupPage } from './components/mockup'
+import { MainLayout } from './components'
 
 const App: React.FC = () => {
 
   return (
-    <MockupPage/>
+    <MainLayout/>
   )
 }
 

@@ -1,6 +1,6 @@
 import React from 'react'
 import styles from './PropertyChip.module.css'
-import { DiffType } from './ResultPanel'
+import { DiffType } from '../ResultPanel'
 
 interface Props {
   label: string
